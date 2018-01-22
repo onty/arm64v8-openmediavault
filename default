@@ -1,0 +1,37 @@
+server {
+
+    listen [::]:80;
+    listen 8080;
+
+    server_name omv.local;
+    root /var/www/html;
+
+    location = / {
+	rewrite ^ /index.html;
+    }
+
+    location / {
+        # Serve a .gz version if it exists
+        gzip_static on;
+        # Try to serve the clean url version first
+        try_files $uri/index.html $uri.htm $uri.html $uri =404;
+    }
+
+    location /favicon.ico {
+        # This never changes, so don't let it expire
+        expires max;
+    }
+
+    location ^~ /theme {
+        # This content should very rarely, if ever, change
+	gzip_static on;
+        expires 1w;
+    }
+
+
+    # Redirect non-https traffic to https
+    # if ($scheme != "https") {
+    #     return 301 https://$host$request_uri;
+    # } # managed by Certbot
+
+}
